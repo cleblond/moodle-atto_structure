@@ -1,0 +1,7 @@
+{
+    "moodle-atto_structure-button": {
+        "requires": [
+            "moodle-editor_atto-plugin"
+        ]
+    }
+}
