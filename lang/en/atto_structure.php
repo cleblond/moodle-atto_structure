@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['marvinjsconfigoptions'] = 'The path of your marvin installation relative to your web root.  (e.g. If your moodle is installed at /var/www/moodle and you install your marvin at /var/www/marvin then you should use the default /marvin)';
+$string['marvinjsconfigoptions'] = 'The path of your MarvinJS installation relative to your web root.  (e.g. If your Moodle is installed at /var/www/moodle and you install your marvin at /var/www/marvinjs then you should use the default /marvinjs)';
 $string['marvinjs_options'] = 'Path to Marvin Applet installation';
 
 $string['createstructure'] = 'Create structure';
@@ -33,7 +33,7 @@ $string['browse'] = 'Browse';
 $string['visible'] = 'Visible';
 $string['nothingtoinsert'] = 'Nothing to insert!';
 $string['dialogtitle'] = 'Enter Preferences';
-$string['insert'] = 'Insert';
+$string['insert'] = 'Insert Image';
 $string['cancel'] = 'Cancel';
-$string['enterflavor'] = 'Enter Ice Cream Flavor';
+$string['enterstructure'] = 'Build your structure and then click "Insert Image"';
 $string['defaultflavor'] = 'Default Ice Cream Flavor';

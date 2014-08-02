@@ -35,7 +35,7 @@ if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configtext('atto_structure/path',
                    get_string('marvinjs_options', 'atto_structure'),
-                   get_string('marvinjsconfigoptions', 'atto_structure'), '/marvin4js', PARAM_TEXT));
+                   get_string('marvinjsconfigoptions', 'atto_structure'), '/marvinjs', PARAM_TEXT));
 
 
 }

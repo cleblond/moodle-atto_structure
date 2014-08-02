@@ -34,7 +34,7 @@ function atto_structure_strings_for_js() {
 
     $PAGE->requires->strings_for_js(array('insert',
                                           'cancel',
-                                          'enterflavor',
+                                          'enterstructure',
                                           'dialogtitle'),
                                     'atto_structure');
 }

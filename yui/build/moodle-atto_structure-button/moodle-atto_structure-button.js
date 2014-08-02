@@ -34,15 +34,15 @@ YUI.add('moodle-atto_structure-button', function (Y, NAME) {
  */
 
 var COMPONENTNAME = 'atto_structure';
-var FLAVORCONTROL = 'structure_flavor';
+var INPUTCONTROL = 'structure_input';
 var LOGNAME = 'atto_structure';
 var CSS = {
         INPUTSUBMIT: 'atto_media_urlentrysubmit',
         INPUTCANCEL: 'atto_media_urlentrycancel',
-        FLAVORCONTROL: 'flavorcontrol'
+        INPUTCONTROL: 'inputcontrol'
     },
     SELECTORS = {
-        FLAVORCONTROL: '.flavorcontrol'
+        INPUTCONTROL: '.inputcontrol'
     };
 
 var TEMPLATE = '' +
@@ -54,12 +54,12 @@ var TEMPLATE = '' +
 //    '<script type="text/javascript" src="http://localhost/marvinjs-14.7.7/js/marvinjslauncher.js"></script>' +
     '<form class="atto_form">' +
         '<div id="{{elementid}}_{{innerform}}" class="mdl-align">' +
-            '<label for="{{elementid}}_{{FLAVORCONTROL}}">{{get_string "enterflavor" component}}</label>' +
-            '<input class="molfile" id="molfile" ' +
-            'name="molfile" value="" />' +
+            '<label for="{{elementid}}_{{INPUTCONTROL}}">{{get_string "enterstructure" component}}</label>' +
+       //     '<input class="molfile" id="molfile" ' +
+       //     'name="molfile" value="" />' +
             '<button class="{{CSS.INPUTSUBMIT}}">{{get_string "insert" component}}</button>' +
         '</div>' +
-        'icon: {{clickedicon}}'  +
+        //'icon: {{clickedicon}}'  +
 //        '<iframe src="http://localhost/marvinjs-14.7.7/editor.html" id="MSketch" class="sketcher-frame" height="510px"></iframe>' +
     '</form>';
 
@@ -77,19 +77,19 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             return;
         }
 
-        var twoicons = ['iconone'];
+        //var twoicons = ['icon'];
 
-        Y.Array.each(twoicons, function(theicon) {
+        //Y.Array.each(twoicons, function(theicon) {
             // Add the structure icon/buttons
 
             this.addButton({
-                icon: 'ed/' + theicon,
+                icon: 'icon',
                 iconComponent: 'atto_structure',
-                buttonName: theicon,
+                buttonName: 'icon',
                 callback: this._displayDialogue,
-                callbackArgs: theicon
+                callbackArgs: 'icon'
             });
-        }, this);
+        //}, this);
 
     },
 
@@ -101,7 +101,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
      * @private
      */
     _getFlavorControlName: function(){
-        return(this.get('host').get('elementid') + '_' + FLAVORCONTROL);
+        return(this.get('host').get('elementid') + '_' + INPUTCONTROL);
     },
 
      /**
@@ -134,6 +134,9 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
         });
         iframe.setAttribute('src', this._getIframeURL());
         iframe.setAttribute('id', 'sketch');
+        iframe.setAttribute('data-toolbars', 'education');
+
+
         //iframe.setAttribute('src', this._getIframeURL());
 
         //append buttons to iframe
@@ -163,13 +166,13 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             content = Y.Node.create(template({
                 elementid: this.get('host').get('elementid'),
                 CSS: CSS,
-                FLAVORCONTROL: FLAVORCONTROL,
+                INPUTCONTROL: INPUTCONTROL,
                 component: COMPONENTNAME,
                 defaultflavor: this.get('defaultflavor'),
                 clickedicon: clickedicon
             }));
-        console.log('getFormContent');
-        console.log(this);
+        //console.log('getFormContent');
+        //console.log(this);
         this._form = content;
         this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImgURL, this);
         //this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImage, this);
@@ -196,7 +199,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             focusAfterHide: null
         }).hide();  
 
-console.log(this);
+//console.log(this);
 
 var referringpage = this;
 Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localhost/marvinjs-14.7.7/js/marvinjslauncher.js', 
@@ -206,12 +209,12 @@ Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localho
     }
 
 
-console.log(referringpage);
+               //console.log(referringpage);
 
-		marvin.onReady(function() {
-
-		console.log("marvin is ready");
-		});
+		//marvin.onReady(function() {
+                //
+		//console.log("marvin is ready");
+		//});
                                             
 
            var marvinController;
@@ -223,7 +226,7 @@ console.log(referringpage);
                     exportPromise = marvinController.sketcherInstance.exportStructure("mrv", null);
 
                         exportPromise.then(function(source) {
-		            console.log("here");
+		            //console.log("here");
 		            //console.log(source);
 		            /*  marvin.onReady(function() {
 
@@ -237,11 +240,11 @@ console.log(referringpage);
 		            //divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\""+imgURL+"\" /></div>";
 		            //console.log(divContent);
 		            //Y.one('#molfile').set('value', imgURL);
-		            console.log("here1 = "+imgURL);
-			    console.log(this);		            
+		            //console.log("here1 = "+imgURL);
+			    //console.log(this);		            
 //return imgURL;
-		            divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + imgURL + "\" /></div>";
-		            Y.one('.molfile').set('value', imgURL);
+		            divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + imgURL + "\" alt=\"MarvinJS PNG\"/></div>";
+		            //Y.one('.molfile').set('value', imgURL);
                             //this._doInsert();
                             
 
@@ -254,7 +257,7 @@ console.log(referringpage);
                             //return;
 		            //document.get('host').insertContentAtFocusPoint(divContent);
 		             //document.editor.focus();
-				//this.get('host').insertContentAtFocusPoint(flavorcontrol.get('value'));
+				//this.get('host').insertContentAtFocusPoint(inputcontrol.get('value'));
 				//document.get('host').insertContentAtFocusPoint(divContent);
 				//document.markUpdated();
 				//this.markUpdated();
@@ -312,11 +315,11 @@ console.log(referringpage);
         }).hide();  
     
 
-        console.log("Entered Do Insert");
-        //var flavorcontrol = this._form.one(SELECTORS.FLAVORCONTROL);
+        //console.log("Entered Do Insert");
+        //var inputcontrol = this._form.one(SELECTORS.INPUTCONTROL);
         //console.log('imgURL=' + imgURL);
         //this._getImgURL();
-        console.log(this._form.one('.molfile').get('value'));
+        //console.log(this._form.one('.molfile').get('value'));
         // If no file is there to insert, don't do it.
         //if (this._form.one('.molfile').get('value')){
         //    return;
@@ -342,7 +345,7 @@ console.log(referringpage);
         },
 
         defaultflavor: {
-            value: ''
+            value: '200'
         }
     }
 });
