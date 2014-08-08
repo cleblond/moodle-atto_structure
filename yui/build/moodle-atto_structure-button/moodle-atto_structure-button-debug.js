@@ -34,15 +34,18 @@ YUI.add('moodle-atto_structure-button', function (Y, NAME) {
  */
 
 var COMPONENTNAME = 'atto_structure';
-var INPUTCONTROL = 'structure_input';
+var WIDTHCONTROL = 'structure_width';
+var HEIGHTCONTROL = 'structure_height';
 var LOGNAME = 'atto_structure';
 var CSS = {
         INPUTSUBMIT: 'atto_media_urlentrysubmit',
         INPUTCANCEL: 'atto_media_urlentrycancel',
-        INPUTCONTROL: 'inputcontrol'
+        WIDTHCONTROL: 'widthcontrol',
+        HEIGHTCONTROL: 'heightcontrol'
     },
     SELECTORS = {
-        INPUTCONTROL: '.inputcontrol'
+        WIDTHCONTROL: '.widthcontrol',
+        HEIGHTCONTROL: '.heightcontrol'
     };
 
 var TEMPLATE = '' +
@@ -54,12 +57,14 @@ var TEMPLATE = '' +
 //    '<script type="text/javascript" src="http://localhost/marvinjs-14.7.7/js/marvinjslauncher.js"></script>' +
     '<form class="atto_form">' +
         '<div id="{{elementid}}_{{innerform}}" class="mdl-align">' +
-            '<label for="{{elementid}}_{{INPUTCONTROL}}">{{get_string "enterstructure" component}}</label>' +
-       //     '<input class="molfile" id="molfile" ' +
-       //     'name="molfile" value="" />' +
-            '<button class="{{CSS.INPUTSUBMIT}}">{{get_string "insert" component}}</button>' +
+            '<strong>{{get_string "instructions" component}}</strong>' +
+            '<table><tr><td><label for="{{elementid}}_{{WIDTHCONTROL}}">{{get_string "width" component}}</label></td>' +
+            '<td><input class="{{CSS.WIDTHCONTROL}}" size="6" id="{{elementid}}_{{WIDTHCONTROL}}" name="{{elementid}}_{{WIDTHCONTROL}}" value="{{defaultwidth}}" /></td><td></td></tr>' +
+            '<tr><td><label for="{{elementid}}_{{HEIGHTCONTROL}}">{{get_string "height" component}}</label></td>' +
+            '<td><input class="{{CSS.HEIGHTCONTROL}}" size="6" id="{{elementid}}_{{HEIGHTCONTROL}}" name="{{elementid}}_{{HEIGHTCONTROL}}" value="{{defaultheight}}" /><td>' +
+            '<button class="{{CSS.INPUTSUBMIT}}">{{get_string "insert" component}}</button></td></tr></table>' +
         '</div>' +
-        //'icon: {{clickedicon}}'  +
+        'icon: {{clickedicon}}'  +
 //        '<iframe src="http://localhost/marvinjs-14.7.7/editor.html" id="MSketch" class="sketcher-frame" height="510px"></iframe>' +
     '</form>';
 
@@ -100,9 +105,10 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
      * @return {String} the name/id of the flavor form field
      * @private
      */
+/*
     _getFlavorControlName: function(){
-        return(this.get('host').get('elementid') + '_' + INPUTCONTROL);
-    },
+        return(this.get('host').get('elementid') + '_' + WIDTHCONTROL);
+    }, */
 
      /**
      * Display the structure Dialogue
@@ -166,9 +172,11 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             content = Y.Node.create(template({
                 elementid: this.get('host').get('elementid'),
                 CSS: CSS,
-                INPUTCONTROL: INPUTCONTROL,
+                WIDTHCONTROL: WIDTHCONTROL,
+                HEIGHTCONTROL: HEIGHTCONTROL,
                 component: COMPONENTNAME,
-                defaultflavor: this.get('defaultflavor'),
+                defaultwidth: this.get('defaultwidth'),
+                defaultheight: this.get('defaultheight'),
                 clickedicon: clickedicon
             }));
         //console.log('getFormContent');
@@ -183,7 +191,10 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
 
     _getIframeURL: function() {
         //return M.cfg.wwwroot + '/lib/editor/atto/plugins/structure/dialog/marvinjs.php';
-        return 'http://localhost/marvinjs-14.7.7/editor.html';
+
+
+
+        return this.get('path')+'/editor.html';
 
 /* + 
           'itemid='+ this._itemid + '&recorder=' + therecorder + '&usewhiteboard=' + this._usewhiteboard  + 
@@ -195,15 +206,44 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
   _getImgURL: function(e) {
 
         e.preventDefault();
-    this.getDialogue({
+    var dialog = this.getDialogue({
             focusAfterHide: null
         }).hide();  
 
+
+                            var widthcontrol = this._form.one(SELECTORS.WIDTHCONTROL);
+			    var newwidth = '';
+                            // If no file is there to insert, don't do it.
+                            if (!widthcontrol.get('value')) {
+                                newwidth = this.get('defaultwidth');
+                            } else {
+                                newwidth = widthcontrol.get('value');
+                            } 
+
+
+
+                            var heightcontrol = this._form.one(SELECTORS.HEIGHTCONTROL);
+			    var newheight = '';
+                            // If no file is there to insert, don't do it.
+                            if (!heightcontrol.get('value')) {
+                                newheight = this.get('defaultheight');
+                            } else {
+                                newheight = heightcontrol.get('value');
+                            } 
+
+
+
+
+
+
 //console.log(this);
 
+       // console.log("path="+this.get('path'));
+
+
 var referringpage = this;
-Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localhost/marvinjs-14.7.7/js/marvinjslauncher.js', 
-'http://localhost/marvinjs-14.7.7/js/promise-0.1.1.min.js'], function (err) {
+Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get('path') + '/js/marvinjslauncher.js', 
+this.get('path') + '/js/promise-0.1.1.min.js'], function (err) {
     if (err) {
         Y.log('Error loading JS: ' + err[0].error, 'error');
         return;
@@ -228,26 +268,28 @@ Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localho
                     exportPromise = marvinController.sketcherInstance.exportStructure("mrv", null);
 
                         exportPromise.then(function(source) {
-		            //console.log("here");
-		            //console.log(source);
-		            /*  marvin.onReady(function() {
 
-			    console.log("marvin is ready"); 
-			    });  */
-		            imgURL = marvin.ImageExporter.mrvToDataUrl(source);
-		            //alert('helloe');
-		            //setTimeout( function_reference, timeoutMillis );
-		            //console.log("after");
-		            //console.log(imgURL);
-		            //divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\""+imgURL+"\" /></div>";
-		            //console.log(divContent);
-		            //Y.one('#molfile').set('value', imgURL);
-		            //console.log("here1 = "+imgURL);
-			    //console.log(this);		            
-//return imgURL;
+
+				var imgsettings = {
+				 'carbonLabelVisible' : false,
+				 'chiralFlagVisible' : true,
+				 'valenceErrorVisible' : true,
+				 'lonePairsVisible' : true,
+				 'implicitHydrogen' : "TERMINAL_AND_HETERO",
+				// 'displayMode' : "WIREFRAME",
+				 'width' : newwidth,
+				 'height' : newheight
+				 }
+
+
+                           // console.log(SELECTORS.WIDTHCONTROL);
+                           // console.log('newwidth=' + referringpage._form.one(SELECTORS.WIDTHCONTROL).get('value'));
+
+                            //convert to image
+		            imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
+
 		            divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + imgURL + "\" alt=\"MarvinJS PNG\"/></div>";
-		            //Y.one('.molfile').set('value', imgURL);
-                            //this._doInsert();
+
                             
 
 			referringpage.editor.focus
@@ -256,15 +298,6 @@ Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localho
 		        referringpage.markUpdated();
 
 
-                            //return;
-		            //document.get('host').insertContentAtFocusPoint(divContent);
-		             //document.editor.focus();
-				//this.get('host').insertContentAtFocusPoint(inputcontrol.get('value'));
-				//document.get('host').insertContentAtFocusPoint(divContent);
-				//document.markUpdated();
-				//this.markUpdated();
-		            //source = source.replace("\n", 'MDL MOLFILE INSERTED\n');
-		            //    Y.one('#' + textfieldid).set('value', source);
                     });
                    //console.log("here2");
                    //console.log(imgURL._detail);
@@ -296,48 +329,9 @@ Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localho
 //return imgURL;
 
 
-},
+}
 
 
-
-
-
-
-
-
-    /**
-     * Inserts the users input onto the page
-     * @method _getDialogueContent
-     * @private
-     */
-    _doInsert : function(e){
-        e.preventDefault();
-        this.getDialogue({
-            focusAfterHide: null
-        }).hide();  
-    
-
-        //console.log("Entered Do Insert");
-        //var inputcontrol = this._form.one(SELECTORS.INPUTCONTROL);
-        //console.log('imgURL=' + imgURL);
-        //this._getImgURL();
-        //console.log(this._form.one('.molfile').get('value'));
-        // If no file is there to insert, don't do it.
-        //if (this._form.one('.molfile').get('value')){
-        //    Y.log('No structure was drawn.', 'warn', LOGNAME);
-        //    return;
-        //}
-        divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + this._form.one('.molfile').get('value') + "\" /></div>";
-
-        this.editor.focus
-        this.get('host').insertContentAtFocusPoint(divContent);
-        //this.get('host').insertContentAtFocusPoint(divContent);
-        this.markUpdated();
-
-
-
-
-    }
 }, { ATTRS: {
         disabled: {
             value: false
@@ -347,8 +341,14 @@ Y.Get.js(['http://localhost/marvinjs-14.7.7/gui/gui.nocache.js', 'http://localho
             value: null
         },
 
-        defaultflavor: {
-            value: '200'
+        defaultwidth: {
+            value: '600'
+        },
+        defaultheight: {
+            value: '100'
+        },
+        path: {
+            value: ''
         }
     }
 });

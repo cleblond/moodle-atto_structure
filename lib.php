@@ -34,7 +34,9 @@ function atto_structure_strings_for_js() {
 
     $PAGE->requires->strings_for_js(array('insert',
                                           'cancel',
-                                          'enterstructure',
+                                          'width',
+                                          'height',
+                                          'instructions',
                                           'dialogtitle'),
                                     'atto_structure');
 }
@@ -64,8 +66,9 @@ function atto_structure_params_for_js($elementid, $options, $fpoptions) {
         //add our disabled param
         $params['disabled'] = $disabled;
         
-        //add our default flavor
-        $params['defaultflavor'] = get_config('atto_structure','defaultflavor');
+        //add our path to marvinjs
+        //$marvinjspath   = "http://" . $_SERVER['HTTP_HOST'] . get_config('atto_structure','path');
+        $params['path'] = "http://" . $_SERVER['HTTP_HOST'] . get_config('atto_structure','path');
 
     return $params;
 }
