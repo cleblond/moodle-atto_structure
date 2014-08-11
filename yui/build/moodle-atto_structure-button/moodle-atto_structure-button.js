@@ -70,13 +70,28 @@ var TEMPLATE = '' +
 
 Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
 
-  
+      _usercontextid: null,
+      _filename: null,
     /**
      * Initialize the button
      *
      * @method Initializer
      */
-    initializer: function() {
+    initializer: function(config) {
+
+        this._usercontextid = config.usercontextid;
+        var timestamp = new Date().getTime();
+        this._filename = timestamp;
+        var host = this.get('host');
+        var options = host.get('filepickeroptions');
+        if (options.image && options.image.itemid) {
+            this._itemid =  options.image.itemid;
+        } else {
+            return;
+        }
+
+
+
         // If we don't have the capability to view then give up.
         if (this.get('disabled')){
             return;
@@ -179,8 +194,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                 defaultheight: this.get('defaultheight'),
                 clickedicon: clickedicon
             }));
-        //console.log('getFormContent');
-        //console.log(this);
+
         this._form = content;
         this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImgURL, this);
         //this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImage, this);
@@ -200,6 +214,83 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
           'itemid='+ this._itemid + '&recorder=' + therecorder + '&usewhiteboard=' + this._usewhiteboard  + 
           '&updatecontrol=' + this._getFilenameControlName();  */
     },
+
+
+
+
+	_uploadFile: function(filedata, recid) {
+		
+		var xhr = new XMLHttpRequest();
+		var ext="png";
+		
+
+			// file received/failed
+			xhr.onreadystatechange = (function(mfp){return function(e) {
+			        //console.log("in onreadystatechange");
+				if (xhr.readyState == 4 ) {
+                                        //console.log("ready state 4");
+					/*if(progress){
+						progress.className = (xhr.status == 200 ? "success" : "failure");
+					}*/
+					if(xhr.status==200){
+						var resp = xhr.responseText;
+						var start= resp.indexOf("success<error>");
+						if (start<1){return;}
+						var end = resp.indexOf("</error>");
+						var filename= resp.substring(start+14,end);
+					        //console.log("filename" + filename);
+						//invoke callbackjs if we have one, otherwise just update the control(default behav.)
+						//if(opts['callbackjs'] && opts['callbackjs']!=''){ 
+						//	var callbackargs  = new Array();
+						//	callbackargs[0]=opts['recorderid'];
+						//	callbackargs[1]='filesubmitted';
+						//	callbackargs[2]=filename;
+						//	callbackargs[3]=opts['updatecontrol'];
+							//window[opts['callbackjs']](callbackargs);
+                                                        //console.log("ready state 4");
+						//	mfp.Output(recid, "File saved successfully.");
+						//	mfp.executeFunctionByName(opts['callbackjs'],window,callbackargs);
+							
+						//}else{
+							//console.log("ready state 4");
+														
+							//mfp.Output(recid, "File saved successfully.");
+                                                        //console.log ("File uploaded succesfully");
+							//var upc = mfp.getbyid(mfp.getbyid(recid + "_updatecontrol").value);
+							//if(!upc){upc = mfp.getbyidinparent(mfp.getbyid(recid + "_updatecontrol").value);}
+							//upc.value=filename;
+						//}
+					}else{
+						//mfp.Output(recid, "File could not be uploaded.");
+						//console.log ("File could not be uploaded!");
+					}
+				}
+			}})(this);
+                        
+			var params = "datatype=uploadfile";
+			//We must URI encode the base64 filedata, because otherwise the "+" characters get turned into spaces
+			//spent hours tracking that down ...justin 20121012
+			params += "&paramone=" + encodeURIComponent(filedata);
+			params += "&paramtwo=" + ext;
+			params += "&paramthree=image";
+			params += "&requestid=" + this._filename;
+			params += "&contextid="+this._usercontextid;
+			params += "&component=user";
+			params += "&filearea=draft";
+			params += "&itemid=" + this._itemid;
+			//console.log("params="+params);
+			xhr.open("POST", M.cfg.wwwroot+"/lib/editor/atto/plugins/structure/structurefilelib.php", true);
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.setRequestHeader("Cache-Control", "no-cache");
+			xhr.setRequestHeader("Content-length", params.length);
+			xhr.setRequestHeader("Connection", "close");
+			xhr.send(params);
+
+
+	},
+
+
+
 
 
 
@@ -286,7 +377,22 @@ this.get('path') + '/js/promise-0.1.1.min.js'], function (err) {
                             //convert to image
 		            imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
 
-		            divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + imgURL + "\" alt=\"MarvinJS PNG\"/></div>";
+                          referringpage._uploadFile(imgURL, "1");
+
+
+
+                   var thefilename = "upfile_"+referringpage._filename+".png";
+
+                   var wwwroot = M.cfg.wwwroot;
+
+	           //var mediahtml='';
+           
+		   // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
+			   var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
+
+////
+
+		            divContent ="<div class=\"marvinjs-image\"><img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/></div>";
 
                             
 
