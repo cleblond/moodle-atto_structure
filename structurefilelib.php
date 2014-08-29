@@ -23,12 +23,7 @@ global $CFG;
 if(!isset($CFG)){
 require_once("../../../../../config.php");
 }
-//require_once('../filter/poodll/poodllinit.php');
-//require_once($CFG->dirroot . "/filter/poodll/poodllinit.php");
 
-//commented just while getting other mods working
-
-//added for moodle 2
 require_once($CFG->libdir . '/filelib.php');
 
 	$datatype = optional_param('datatype', "", PARAM_TEXT);    // Type of action/data we are requesting
@@ -103,22 +98,12 @@ function uploadfile($filedata,  $fileextension, $mediatype, $actionid,$contextid
 	//make filename and set it
 	//we are trying to remove useless junk in the draft area here
 	//when we know its stable, we will do the same for non images too
-	//if($mediatype=='image'){
+
 		$filenamebase = "upfile_" . $actionid . "." ;
-	//}else{
-	//	$filenamebase = "upfile_" . rand(100,32767) . rand(100,32767) . "." ;
-	//}
+
 	$filename = $filenamebase . $fileextension;
 	$record->filename = $filename;
 	
-	
-	//in most cases we will be storing files in a draft area and lettign Moodle do the rest
-	//previously we only allowed one file in draft, but we removed that limit
-	/*
-	if($farea=='draft'){
-		$fs->delete_area_files($contextid,$comp,$farea,$itemid);
-	}
-	*/
 	
 	//if file already exists, raise an error
 	if($fs->file_exists($contextid,$comp,$farea,$itemid,$filepath,$filename)){
@@ -158,54 +143,8 @@ function uploadfile($filedata,  $fileextension, $mediatype, $actionid,$contextid
 	
 		//decode the data and store it in memory
 		$xfiledata = base64_decode($filedata);
-		
-		//Determine if we need to convert and what format the conversions should take
-		if($CFG->filter_poodll_ffmpeg && $CFG->filter_poodll_audiotranscode && $fileextension!="mp3" && $mediatype=="audio"){
-			$convext = "mp3";	
-		}else if($CFG->filter_poodll_ffmpeg && $CFG->filter_poodll_videotranscode && $fileextension!="mp4" && $mediatype=="video"){
-			$convext = "mp4";
-		}else{
-			$convext="";
-		}
-		
-		//if we need to convert with ffmpeg, get on with it
-		if($convext!=""){
-		
-			//determine the temp directory
-			if (isset($CFG->tempdir)){
-				$tempdir =  $CFG->tempdir . "/";	
-			}else{
-				//moodle 2.1 users have no $CFG->tempdir
-				$tempdir =  $CFG->dataroot . "/temp/";
-			}
-			//actually make the file on disk so FFMPEG can get it
-			$ret = file_put_contents($tempdir . $filename, $xfiledata);
-			
-			//if successfully saved to disk, convert
-			if($ret){
-			
-				$stored_file = convert_with_ffmpeg($record,$tempdir,$filename,$filenamebase, $convext );
-				if($stored_file){
-					$filename=$stored_file->get_filename();
-		
-				//if failed, default to using the original uploaded data
-				//and delete the temp file we made
-				}else{
-					$stored_file = $fs->create_file_from_string($record, $xfiledata);
-					if(is_readable(realpath($tempdir . $filename))){
-						unlink(realpath($tempdir . $filename));
-					}
-				}				
-				
-			//if couldn't create on disk fall back to the original data
-			}else{
-				$stored_file = $fs->create_file_from_string($record, $xfiledata);
-			}
-			
-		//if we are not converting, then just create our moodle file entry with original file data 		
-		}else{
-			$stored_file = $fs->create_file_from_string($record, $xfiledata);
-		}
+		$stored_file = $fs->create_file_from_string($record, $xfiledata);
+		//}
 	
 	}
 	

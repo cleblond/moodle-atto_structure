@@ -182,15 +182,15 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
 
 
     _uploadFile: function(filedata, recid, filename) {
-        
+       // console.log("in _uploadfile");
         var xhr = new XMLHttpRequest();
         var ext="png";
 
             // file received/failed
             xhr.onreadystatechange = (function(){return function() {
-                    //console.log("in onreadystatechange");
+                  //  console.log("in onreadystatechange");
                 if (xhr.readyState === 4 ) {
-                    //console.log("ready state 4");
+                  //  console.log("ready state 4");
                     if(xhr.status===200){
                         var resp = xhr.responseText;
                         var start= resp.indexOf("success<error>");
@@ -208,7 +208,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             params += "&component=user";
             params += "&filearea=draft";
             params += "&itemid=" + this._itemid;
-            //console.log("params="+params);
+           // console.log("params="+params);
             xhr.open("POST", M.cfg.wwwroot+"/lib/editor/atto/plugins/structure/structurefilelib.php", true);
             xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
             xhr.setRequestHeader("Cache-Control", "no-cache");
@@ -223,73 +223,164 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
         this.getDialogue({
             focusAfterHide: null
         }).hide();
-
-                            var widthcontrol = this._form.one(SELECTORS.WIDTHCONTROL);
+              //  console.log("in _getImgURL");
+                var widthcontrol = this._form.one(SELECTORS.WIDTHCONTROL);
                 var newwidth = '';
-                            // If no file is there to insert, don't do it.
-                            if (!widthcontrol.get('value')) {
-                                newwidth = this.get('defaultwidth');
-                            } else {
-                                newwidth = widthcontrol.get('value');
-                            }
+                       var  filename = new Date().getTime();
+                        var thefilename = "upfile_"+filename+".png";
+                        var divContent = '';
+                  //   console.log("thefilename1="+thefilename);
+                    // If no file is there to insert, don't do it.
+                    if (!widthcontrol.get('value')) {
+                        newwidth = this.get('defaultwidth');
+                    } else {
+                        newwidth = widthcontrol.get('value');
+                    }
 
-                            var heightcontrol = this._form.one(SELECTORS.HEIGHTCONTROL);
+                var heightcontrol = this._form.one(SELECTORS.HEIGHTCONTROL);
                 var newheight = '';
-                            // If no file is there to insert, don't do it.
-                            if (!heightcontrol.get('value')) {
-                                newheight = this.get('defaultheight');
-                            } else {
-                                newheight = heightcontrol.get('value');
-                            }
+                // If no file is there to insert, don't do it.
+                if (!heightcontrol.get('value')) {
+                newheight = this.get('defaultheight');
+                } else {
+                newheight = heightcontrol.get('value');
+                }
 
+                var referringpage = this;
+                Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get('path') + '/js/marvinjslauncher.js',
+                   this.get('path') + '/js/promise-0.1.1.min.js'], function (err) {
+                       if (err) {
+                           return;
+                       }
 
-        var referringpage = this;
-        Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get('path') + '/js/marvinjslauncher.js',
-        this.get('path') + '/js/promise-0.1.1.min.js'], function (err) {
-    if (err) {
-        return;
-    }
-
-           var marvinController;
-            MarvinJSUtil.getEditor("#sketch").then(
-                function(sketcherInstance) {
-                    marvinController = new MarvinControllerClass(
+                   var marvinController;
+                //   console.log("before");
+                   MarvinJSUtil.getEditor("#sketch").then(
+                   
+                   function(sketcherInstance) {
+                        marvinController = new MarvinControllerClass(
                         sketcherInstance);
-
-                    exportPromise = marvinController.sketcherInstance.exportStructure("mrv", null);
-
+                        //console.log("after ");
+                        exportPromise = marvinController.sketcherInstance.exportStructure("mrv", null);
+                    //    console.log(exportPromise);
+                    //    console.log("after ");
                         exportPromise.then(function(source) {
+                    //    console.log("exportpromise then");
+                        var imgsettings = {
+                             'carbonLabelVisible' : false,
+                             'chiralFlagVisible' : true,
+                             'valenceErrorVisible' : true,
+                             'lonePairsVisible' : true,
+                             'implicitHydrogen' : "TERMINAL_AND_HETERO",
+                             'width' : newwidth,
+                             'height' : newheight
+                        };
+                    //    console.log("source1");
+                    //    console.log(source);
+                        //setTimeout(alert("Hello "), 2000);
+
+/*
+var promise = new Promise(function(resolve, reject) {
+  imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
+    
+  if (imgURL) {
+    console.log("made it here");
+    resolve(imgURL);
+  }
+  else {
+        console.log("opps something broke");
+    reject(new Error("It broke"));
+  }
+});
+
+promise.then(function(result) {
+  console.log(result); // "Stuff worked!"
+}, function(err) {
+  console.log(err); // Error: "It broke"
+});
+*/
 
 
-                var imgsettings = {
-                 'carbonLabelVisible' : false,
-                 'chiralFlagVisible' : true,
-                 'valenceErrorVisible' : true,
-                 'lonePairsVisible' : true,
-                 'implicitHydrogen' : "TERMINAL_AND_HETERO",
-                // 'displayMode' : "WIREFRAME",
-                 'width' : newwidth,
-                 'height' : newheight
-                 };
-                    imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
-
-                    var filename = new Date().getTime();
-
-                          referringpage._uploadFile(imgURL, "1", filename);
 
 
 
-                   var thefilename = "upfile_"+filename+".png";
 
-                   var wwwroot = M.cfg.wwwroot;
-           // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
-               var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
 
-                    divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";
+
+
+/*
+marvin.onReady(function() {
+                        console.log(source);
+          imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
+
+ console.log("after ImageExporter Call call");
+                        var filename = new Date().getTime();
+                        referringpage._uploadFile(imgURL, "1", filename);
+                        console.log("after _uploadfile call");
+                        var thefilename = "upfile_"+filename+".png";
+                        var wwwroot = M.cfg.wwwroot;
+               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
+                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
+                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";
+
+
+    });
+*/
+
+
+
+
+function test(source, thefilename){
+                       // console.log("source3");
+ //console.log(source);
+          imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
+
+ //console.log("after ImageExporter Call call");
+                        //filename = new Date().getTime();
+                       // console.log("thefilename2="+thefilename);
+                        referringpage._uploadFile(imgURL, "1", filename);
+                       // console.log("after _uploadfile call");
+                        //thefilename = "upfile_"+filename+".png";
+                        var wwwroot = M.cfg.wwwroot;
+               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
+                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
+                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";
+// console.log("divcontent=" + divContent);
+
 
             referringpage.editor.focus();
                 referringpage.get('host').insertContentAtFocusPoint(divContent);
                 referringpage.markUpdated();
+
+}
+
+marvin.onReady(function() {
+                     //   console.log("source2");
+                     //   console.log(source);
+test(source, thefilename);
+
+
+
+});
+
+
+
+
+
+/*
+                        //imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
+                        console.log("after ImageExporter Call call");
+                        var filename = new Date().getTime();
+                        referringpage._uploadFile(imgURL, "1", filename);
+                        console.log("after _uploadfile call");
+                        var thefilename = "upfile_"+filename+".png";
+                        var wwwroot = M.cfg.wwwroot;
+               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
+                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
+                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";  */
+
+
+
                     });
                 });
             MarvinControllerClass = (function() {
