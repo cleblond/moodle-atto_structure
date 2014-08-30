@@ -18,7 +18,7 @@
  * structure settings.
  *
  * @package   atto_structure
- * @copyright COPYRIGHTINFO
+ * @copyright  2014 onwards Carl LeBlond
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,15 +29,9 @@ $ADMIN->add('editoratto', new admin_category('atto_structure', new lang_string('
 
 $settings = new admin_settingpage('atto_structure_settings', new lang_string('settings', 'atto_structure'));
 if ($ADMIN->fulltree) {
-	// An option setting
-//	$settings->add(new admin_setting_configtext('atto_structure/defaultflavor', 
-//		get_string('defaultflavor', 'atto_structure'), '', 'vanilla', PARAM_TEXT));
-
     $settings->add(new admin_setting_configtext('atto_structure/path',
                    get_string('marvinjs_options', 'atto_structure'),
                    get_string('marvinjsconfigoptions', 'atto_structure'), '/marvinjs', PARAM_TEXT));
-
-
 }
 
 

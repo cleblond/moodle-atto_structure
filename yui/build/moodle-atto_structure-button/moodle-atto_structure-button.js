@@ -14,17 +14,14 @@ YUI.add('moodle-atto_structure-button', function (Y, NAME) {
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /*
  * @package    atto_structure
- * @copyright  COPYRIGHTINFO
+ * @copyright  2014 onwards Carl LeBlond
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 /**
  * @module moodle-atto_structure-button
  */
-
 /**
  * Atto text editor structure plugin.
  *
@@ -32,7 +29,6 @@ YUI.add('moodle-atto_structure-button', function (Y, NAME) {
  * @class button
  * @extends M.editor_atto.EditorPlugin
  */
-
 var COMPONENTNAME = 'atto_structure';
 var WIDTHCONTROL = 'structure_width';
 var HEIGHTCONTROL = 'structure_height';
@@ -47,49 +43,41 @@ var CSS = {
         WIDTHCONTROL: '.widthcontrol',
         HEIGHTCONTROL: '.heightcontrol'
     };
-
-var TEMPLATE = '' +
-    '<form class="atto_form">' +
-        '<div id="{{elementid}}_{{innerform}}" class="mdl-align">' +
-            '<strong>{{get_string "instructions" component}}</strong>' +
-            '<table><tr><td><label for="{{elementid}}_{{WIDTHCONTROL}}">{{get_string "width" component}}</label></td>' +
-            '<td><input class="{{CSS.WIDTHCONTROL}}" size="6" id="{{elementid}}_{{WIDTHCONTROL}}" name="{{elementid}}_{{WIDTHCONTROL}}"'+
-            'value="{{defaultwidth}}" /></td><td></td></tr>' +
-            '<tr><td><label for="{{elementid}}_{{HEIGHTCONTROL}}">{{get_string "height" component}}</label></td>' +
-            '<td><input class="{{CSS.HEIGHTCONTROL}}" size="6" id="{{elementid}}_{{HEIGHTCONTROL}}" name="{{elementid}}_{{HEIGHTCONTROL}}" value="{{defaultheight}}" /><td>' +
-            '<button class="{{CSS.INPUTSUBMIT}}">{{get_string "insert" component}}</button></td></tr></table>' +
-        '</div>' +
-    '</form>';
-
-Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto.EditorPlugin, [], {
-
-      _usercontextid: null,
-      _filename: null,
-    /**
-     * Initialize the button
-     *
-     * @method Initializer
-     */
-    initializer: function(config) {
-
-        this._usercontextid = config.usercontextid;
-        var timestamp = new Date().getTime();
-        this._filename = timestamp;
-        var host = this.get('host');
-        var options = host.get('filepickeroptions');
-        if (options.image && options.image.itemid) {
-            this._itemid =  options.image.itemid;
-        } else {
-            return;
-        }
-
-        // If we don't have the capability to view then give up.
-        if (this.get('disabled')){
-            return;
-        }
-
+var TEMPLATE = '' + '<form class="atto_form">' +
+    '<div id="{{elementid}}_{{innerform}}" class="mdl-align">' +
+    '<strong>{{get_string "instructions" component}}</strong>' +
+    '<table><tr><td><label for="{{elementid}}_{{WIDTHCONTROL}}">{{get_string "width" component}}</label></td>' +
+    '<td><input class="{{CSS.WIDTHCONTROL}}" size="6" id="{{elementid}}_{{WIDTHCONTROL}}" name="{{elementid}}_{{WIDTHCONTROL}}"' +
+    'value="{{defaultwidth}}" /></td><td></td></tr>' +
+    '<tr><td><label for="{{elementid}}_{{HEIGHTCONTROL}}">{{get_string "height" component}}</label></td>' +
+    '<td><input class="{{CSS.HEIGHTCONTROL}}" size="6" id="{{elementid}}_{{HEIGHTCONTROL}}" name="{{elementid}}_{{HEIGHTCONTROL}}" value="{{defaultheight}}" /><td>' +
+    '<button class="{{CSS.INPUTSUBMIT}}">{{get_string "insert" component}}</button></td></tr></table>' +
+    '</div>' + '</form>';
+Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
+    .EditorPlugin, [], {
+        _usercontextid: null,
+        _filename: null,
+        /**
+         * Initialize the button
+         *
+         * @method Initializer
+         */
+        initializer: function(config) {
+            this._usercontextid = config.usercontextid;
+            var timestamp = new Date().getTime();
+            this._filename = timestamp;
+            var host = this.get('host');
+            var options = host.get('filepickeroptions');
+            if (options.image && options.image.itemid) {
+                this._itemid = options.image.itemid;
+            } else {
+                return;
+            }
+            // If we don't have the capability to view then give up.
+            if (this.get('disabled')) {
+                return;
+            }
             // Add the structure icon/buttons
-
             this.addButton({
                 icon: 'icon',
                 iconComponent: 'atto_structure',
@@ -97,323 +85,229 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                 callback: this._displayDialogue,
                 callbackArgs: 'icon'
             });
-
-    },
-
-
-     /**
-     * Display the structure Dialogue
-     *
-     * @method _displayDialogue
-     * @private
-     */
-    _displayDialogue: function(e, clickedicon) {
-        e.preventDefault();
-        //var width='auto';
-
-
-        var dialogue = this.getDialogue({
-            headerContent: M.util.get_string('dialogtitle', COMPONENTNAME),
-            width: '768px',
-            focusAfterHide: clickedicon
-        });
-
-        var iframe = Y.Node.create('<iframe></iframe>');
-        iframe.setStyles({
-            height: '510px',
-            border: 'none',
-            width: '100%'
-        });
-        iframe.setAttribute('src', this._getIframeURL());
-        iframe.setAttribute('id', 'sketch');
-        iframe.setAttribute('data-toolbars', 'education');
-
-        //append buttons to iframe
-        var buttonform = this._getFormContent(clickedicon);
-
-        var bodycontent =  Y.Node.create('<div></div>');
-        bodycontent.append(buttonform).append(iframe);
-        //bodycontent.append(buttonform);
-
-        //set to bodycontent
-        dialogue.set('bodyContent', bodycontent);
-        dialogue.show();
-        this.markUpdated();
-    },
-
-
-     /**
-     * Return the dialogue content for the tool, attaching any required
-     * events.
-     *
-     * @method _getDialogueContent
-     * @return {Node} The content to place in the dialogue.
-     * @private
-     */
-    _getFormContent: function(clickedicon) {
-        var template = Y.Handlebars.compile(TEMPLATE),
-            content = Y.Node.create(template({
-                elementid: this.get('host').get('elementid'),
-                CSS: CSS,
-                WIDTHCONTROL: WIDTHCONTROL,
-                HEIGHTCONTROL: HEIGHTCONTROL,
-                component: COMPONENTNAME,
-                defaultwidth: this.get('defaultwidth'),
-                defaultheight: this.get('defaultheight'),
-                clickedicon: clickedicon
-            }));
-
-        this._form = content;
-        this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImgURL, this);
-        return content;
-    },
-
-
-
-    _getIframeURL: function() {
-
-        return this.get('path')+'/editor.html';
-
-    },
-
-
-
-
-    _uploadFile: function(filedata, recid, filename) {
-       // console.log("in _uploadfile");
-        var xhr = new XMLHttpRequest();
-        var ext="png";
-
+        },
+        /**
+         * Display the structure Dialogue
+         *
+         * @method _displayDialogue
+         * @private
+         */
+        _displayDialogue: function(e, clickedicon) {
+            e.preventDefault();
+            var dialogue = this.getDialogue({
+                headerContent: M.util.get_string('dialogtitle',
+                    COMPONENTNAME),
+                width: '768px',
+                focusAfterHide: clickedicon
+            });
+            var iframe = Y.Node.create('<iframe></iframe>');
+            iframe.setStyles({
+                height: '510px',
+                border: 'none',
+                width: '100%'
+            });
+            iframe.setAttribute('src', this._getIframeURL());
+            iframe.setAttribute('id', 'sketch');
+            iframe.setAttribute('data-toolbars', 'education');
+            //append buttons to iframe
+            var buttonform = this._getFormContent(clickedicon);
+            var bodycontent = Y.Node.create('<div></div>');
+            bodycontent.append(buttonform).append(iframe);
+            //bodycontent.append(buttonform);
+            //set to bodycontent
+            dialogue.set('bodyContent', bodycontent);
+            dialogue.show();
+            this.markUpdated();
+        },
+        /**
+         * Return the dialogue content for the tool, attaching any required
+         * events.
+         *
+         * @method _getDialogueContent
+         * @return {Node} The content to place in the dialogue.
+         * @private
+         */
+        _getFormContent: function(clickedicon) {
+            var template = Y.Handlebars.compile(TEMPLATE),
+                content = Y.Node.create(template({
+                    elementid: this.get('host').get('elementid'),
+                    CSS: CSS,
+                    WIDTHCONTROL: WIDTHCONTROL,
+                    HEIGHTCONTROL: HEIGHTCONTROL,
+                    component: COMPONENTNAME,
+                    defaultwidth: this.get('defaultwidth'),
+                    defaultheight: this.get('defaultheight'),
+                    clickedicon: clickedicon
+                }));
+            this._form = content;
+            this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImgURL,
+                this);
+            return content;
+        },
+        _getIframeURL: function() {
+            return this.get('path') + '/editor.html';
+        },
+        _uploadFile: function(filedata, recid, filename) {
+            var xhr = new XMLHttpRequest();
+            var ext = "png";
             // file received/failed
-            xhr.onreadystatechange = (function(){return function() {
-                  //  console.log("in onreadystatechange");
-                if (xhr.readyState === 4 ) {
-                  //  console.log("ready state 4");
-                    if(xhr.status===200){
-                        var resp = xhr.responseText;
-                        var start= resp.indexOf("success<error>");
-                        if (start<1){return;}
-                        
+            xhr.onreadystatechange = (function() {
+                return function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            var resp = xhr.responseText;
+                            var start = resp.indexOf(
+                                "success<error>");
+                            if (start < 1) {
+                                return;
+                            }
+                        }
                     }
-                }
-            };})(this);
+                };
+            })(this);
             var params = "datatype=uploadfile";
             params += "&paramone=" + encodeURIComponent(filedata);
             params += "&paramtwo=" + ext;
             params += "&paramthree=image";
             params += "&requestid=" + filename;
-            params += "&contextid="+this._usercontextid;
+            params += "&contextid=" + this._usercontextid;
             params += "&component=user";
             params += "&filearea=draft";
             params += "&itemid=" + this._itemid;
-           // console.log("params="+params);
-            xhr.open("POST", M.cfg.wwwroot+"/lib/editor/atto/plugins/structure/structurefilelib.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.open("POST", M.cfg.wwwroot +
+                "/lib/editor/atto/plugins/structure/structurefilelib.php",
+                true);
+            xhr.setRequestHeader("Content-Type",
+                "application/x-www-form-urlencoded");
             xhr.setRequestHeader("Cache-Control", "no-cache");
             xhr.setRequestHeader("Content-length", params.length);
             xhr.setRequestHeader("Connection", "close");
             xhr.send(params);
-    },
-
-  _getImgURL: function(e) {
-
-        e.preventDefault();
-        this.getDialogue({
-            focusAfterHide: null
-        }).hide();
-              //  console.log("in _getImgURL");
-                var widthcontrol = this._form.one(SELECTORS.WIDTHCONTROL);
-                var newwidth = '';
-                       var  filename = new Date().getTime();
-                        var thefilename = "upfile_"+filename+".png";
-                        var divContent = '';
-                  //   console.log("thefilename1="+thefilename);
-                    // If no file is there to insert, don't do it.
-                    if (!widthcontrol.get('value')) {
-                        newwidth = this.get('defaultwidth');
-                    } else {
-                        newwidth = widthcontrol.get('value');
-                    }
-
-                var heightcontrol = this._form.one(SELECTORS.HEIGHTCONTROL);
-                var newheight = '';
-                // If no file is there to insert, don't do it.
-                if (!heightcontrol.get('value')) {
+        },
+        _getImgURL: function(e) {
+            e.preventDefault();
+            this.getDialogue({
+                focusAfterHide: null
+            }).hide();
+            var widthcontrol = this._form.one(SELECTORS.WIDTHCONTROL);
+            var newwidth = '';
+            var filename = new Date().getTime();
+            var thefilename = "upfile_" + filename + ".png";
+            var divContent = '';
+            if (!widthcontrol.get('value')) {
+                newwidth = this.get('defaultwidth');
+            } else {
+                newwidth = widthcontrol.get('value');
+            }
+            var heightcontrol = this._form.one(SELECTORS.HEIGHTCONTROL);
+            var newheight = '';
+            // If no file is there to insert, don't do it.
+            if (!heightcontrol.get('value')) {
                 newheight = this.get('defaultheight');
-                } else {
+            } else {
                 newheight = heightcontrol.get('value');
+            }
+            var referringpage = this;
+            Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get(
+                    'path') + '/js/marvinjslauncher.js',
+                   this.get('path') + '/js/promise-0.1.1.min.js'], function(err) {
+                if (err) {
+                    return;
                 }
-
-                var referringpage = this;
-                Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get('path') + '/js/marvinjslauncher.js',
-                   this.get('path') + '/js/promise-0.1.1.min.js'], function (err) {
-                       if (err) {
-                           return;
-                       }
-
-                   var marvinController;
-                //   console.log("before");
-                   MarvinJSUtil.getEditor("#sketch").then(
-                   
-                   function(sketcherInstance) {
-                        marvinController = new MarvinControllerClass(
+                var marvinController;
+                MarvinJSUtil.getEditor("#sketch").then(function(
+                    sketcherInstance) {
+                    marvinController = new MarvinControllerClass(
                         sketcherInstance);
-                        //console.log("after ");
-                        exportPromise = marvinController.sketcherInstance.exportStructure("mrv", null);
-                    //    console.log(exportPromise);
-                    //    console.log("after ");
-                        exportPromise.then(function(source) {
-                    //    console.log("exportpromise then");
+                    exportPromise = marvinController.sketcherInstance
+                        .exportStructure("mrv", null);
+                    exportPromise.then(function(source) {
                         var imgsettings = {
-                             'carbonLabelVisible' : false,
-                             'chiralFlagVisible' : true,
-                             'valenceErrorVisible' : true,
-                             'lonePairsVisible' : true,
-                             'implicitHydrogen' : "TERMINAL_AND_HETERO",
-                             'width' : newwidth,
-                             'height' : newheight
+                            'carbonLabelVisible': false,
+                            'chiralFlagVisible': true,
+                            'valenceErrorVisible': true,
+                            'lonePairsVisible': true,
+                            'implicitHydrogen': "TERMINAL_AND_HETERO",
+                            'width': newwidth,
+                            'height': newheight
                         };
-                    //    console.log("source1");
-                    //    console.log(source);
-                        //setTimeout(alert("Hello "), 2000);
 
-/*
-var promise = new Promise(function(resolve, reject) {
-  imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
-    
-  if (imgURL) {
-    console.log("made it here");
-    resolve(imgURL);
-  }
-  else {
-        console.log("opps something broke");
-    reject(new Error("It broke"));
-  }
-});
-
-promise.then(function(result) {
-  console.log(result); // "Stuff worked!"
-}, function(err) {
-  console.log(err); // Error: "It broke"
-});
-*/
-
-
-
-
-
-
-
-
-
-/*
-marvin.onReady(function() {
-                        console.log(source);
-          imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
-
- console.log("after ImageExporter Call call");
-                        var filename = new Date().getTime();
-                        referringpage._uploadFile(imgURL, "1", filename);
-                        console.log("after _uploadfile call");
-                        var thefilename = "upfile_"+filename+".png";
-                        var wwwroot = M.cfg.wwwroot;
-               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
-                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
-                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";
-
-
-    });
-*/
-
-
-
-
-function test(source, thefilename){
-                       // console.log("source3");
- //console.log(source);
-          imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
-
- //console.log("after ImageExporter Call call");
-                        //filename = new Date().getTime();
-                       // console.log("thefilename2="+thefilename);
-                        referringpage._uploadFile(imgURL, "1", filename);
-                       // console.log("after _uploadfile call");
-                        //thefilename = "upfile_"+filename+".png";
-                        var wwwroot = M.cfg.wwwroot;
-               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
-                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
-                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";
-// console.log("divcontent=" + divContent);
-
-
-            referringpage.editor.focus();
-                referringpage.get('host').insertContentAtFocusPoint(divContent);
-                referringpage.markUpdated();
-
-}
-
-marvin.onReady(function() {
-                     //   console.log("source2");
-                     //   console.log(source);
-test(source, thefilename);
-
-
-
-});
-
-
-
-
-
-/*
-                        //imgURL = marvin.ImageExporter.mrvToDataUrl(source, "image/png", imgsettings);
-                        console.log("after ImageExporter Call call");
-                        var filename = new Date().getTime();
-                        referringpage._uploadFile(imgURL, "1", filename);
-                        console.log("after _uploadfile call");
-                        var thefilename = "upfile_"+filename+".png";
-                        var wwwroot = M.cfg.wwwroot;
-               // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
-                        var filesrc =wwwroot+'/draftfile.php/'+  referringpage._usercontextid +'/user/draft/'+referringpage._itemid+'/' + thefilename;
-                        divContent ="<img name=\"pict\" src=\"" + filesrc + "\" alt=\"MarvinJS PNG\"/>";  */
-
-
-
+                        function test(source,
+                            thefilename) {
+                            imgURL = marvin
+                                .ImageExporter
+                                .mrvToDataUrl(
+                                    source,
+                                    "image/png",
+                                    imgsettings
+                                );
+                            referringpage._uploadFile(
+                                imgURL,
+                                "1",
+                                filename
+                            );
+                            var wwwroot = M
+                                .cfg.wwwroot;
+                            // It will store in mdl_question with the "@@PLUGINFILE@@/myfile.mp3" for the filepath.
+                            var filesrc =
+                                wwwroot +
+                                '/draftfile.php/' +
+                                referringpage
+                                ._usercontextid +
+                                '/user/draft/' +
+                                referringpage
+                                ._itemid +
+                                '/' +
+                                thefilename;
+                            divContent =
+                                "<img name=\"pict\" src=\"" +
+                                filesrc +
+                                "\" alt=\"MarvinJS PNG\"/>";
+                            referringpage.editor
+                                .focus();
+                            referringpage.get(
+                                    'host')
+                                .insertContentAtFocusPoint(
+                                    divContent
+                                );
+                            referringpage.markUpdated();
+                        }
+                        marvin.onReady(function() {
+                            test(source,
+                                thefilename
+                            );
+                        });
                     });
                 });
-            MarvinControllerClass = (function() {
-                function MarvinControllerClass(
-                    sketcherInstance
-                ) {
-                    this.sketcherInstance =
-                        sketcherInstance;
-                }
-                return MarvinControllerClass;
-            }());
-});
-
-}
-
-}, { ATTRS: {
-        disabled: {
-            value: false
-        },
-
-        usercontextid: {
-            value: null
-        },
-
-        defaultwidth: {
-            value: '600'
-        },
-        defaultheight: {
-            value: '100'
-        },
-        path: {
-            value: ''
+                MarvinControllerClass = (function() {
+                    function MarvinControllerClass(
+                        sketcherInstance) {
+                        this.sketcherInstance =
+                            sketcherInstance;
+                    }
+                    return MarvinControllerClass;
+                }());
+            });
         }
-    }
-});
+    }, {
+        ATTRS: {
+            disabled: {
+                value: false
+            },
+            usercontextid: {
+                value: null
+            },
+            defaultwidth: {
+                value: '600'
+            },
+            defaultheight: {
+                value: '100'
+            },
+            path: {
+                value: ''
+            }
+        }
+    });
 
 
 }, '@VERSION@', {"requires": ["moodle-editor_atto-plugin"]});

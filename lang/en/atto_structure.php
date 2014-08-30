@@ -18,13 +18,12 @@
  * Strings for component 'atto_structure', language 'en'.
  *
  * @package    atto_structure
- * @copyright  COPYRIGHTINFO
+ * @copyright  2014 onwards Carl LeBlond
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['marvinjsconfigoptions'] = 'The path of your marvin installation relative to your web root.  (e.g. If your moodle is installed at /var/www/moodle and you install your marvin at /var/www/marvin then you should use the default /marvin)';
 $string['marvinjs_options'] = 'Path to Marvin Applet installation';
-
 $string['createstructure'] = 'Create structure';
 $string['pluginname'] = 'structure (Atto)';
 $string['settings'] = 'structure (Atto)';

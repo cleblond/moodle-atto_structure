@@ -18,7 +18,7 @@
  * Plugin capabilities
  *
  * @package    atto_structure
- * @copyright  COPYRIGHTINFO
+ * @copyright  2014 onwards Carl LeBlond
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,10 +30,10 @@ $capabilities = array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
-			'coursecreator' => CAP_ALLOW,
-			'teacher' => CAP_ALLOW,
+                        'coursecreator' => CAP_ALLOW,
+                        'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
-			'student' => CAP_ALLOW,
+                        'student' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
     )
