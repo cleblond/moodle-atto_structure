@@ -25,7 +25,7 @@
 $string['marvinjsconfigoptions'] = 'The path of your marvin installation relative to your web root.  (e.g. If your moodle is installed at /var/www/moodle and you install your marvin at /var/www/marvin then you should use the default /marvin)';
 $string['marvinjs_options'] = 'Path to Marvin Applet installation';
 $string['createstructure'] = 'Create structure';
-$string['pluginname'] = 'structure (Atto)';
+$string['pluginname'] = 'Chemical Structure';
 $string['settings'] = 'structure (Atto)';
 $string['browse'] = 'Browse';
 $string['visible'] = 'Visible';
