@@ -1,5 +1,5 @@
 MarvinJS atto plugin (atto_structure) for Moodle.
-Alows users to create chemcial structures and reactions then easily
+Alows users to create chemical structures and reactions then easily
 insert image into Moodle.
 
 Quick Installation
@@ -10,6 +10,7 @@ Quick Installation
 5) Set the path to MarvinJS in the settings page that appears 
    or proceed to admin setting for this filter and set path).
 6) Proceed to Site administration > Plugins > Text editors > Atto HTML 
-   editor > Atto toolbar settings and add the new plugin to the tool bar config.
+   editor > Atto toolbar settings and add the new plugin to the tool bar
+   config, by adding "structure" at the end of one of the rows of buttons.
 
 
