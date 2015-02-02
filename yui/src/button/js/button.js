@@ -211,7 +211,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             var referringpage = this;
             Y.Get.js([this.get('path') + '/gui/gui.nocache.js', this.get(
                     'path') + '/js/marvinjslauncher.js',
-                   this.get('path') + '/js/promise-0.1.1.min.js'], function(err) {
+                   this.get('path') + '/gui/lib/promise-0.1.1.min.js'], function(err) {
                 if (err) {
                     return;
                 }
@@ -223,6 +223,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                     exportPromise = marvinController.sketcherInstance
                         .exportStructure("mrv", null);
                     exportPromise.then(function(source) {
+                        console.log(source);
                         var imgsettings = {
                             'carbonLabelVisible': false,
                             'chiralFlagVisible': true,

@@ -222,6 +222,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                     exportPromise = marvinController.sketcherInstance
                         .exportStructure("mrv", null);
                     exportPromise.then(function(source) {
+                        console.log(source);
                         var imgsettings = {
                             'carbonLabelVisible': false,
                             'chiralFlagVisible': true,
