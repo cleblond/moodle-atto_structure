@@ -101,6 +101,8 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                 width: '768px',
                 focusAfterHide: clickedicon
             });
+            var d = new Date();
+            var marvinjsid = d.getTime();
             var iframe = Y.Node.create('<iframe></iframe>');
             iframe.setStyles({
                 height: '510px',
@@ -108,10 +110,10 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                 width: '100%'
             });
             iframe.setAttribute('src', this._getIframeURL());
-            iframe.setAttribute('id', 'sketch');
+            iframe.setAttribute('id', marvinjsid);
             iframe.setAttribute('data-toolbars', 'reaction');
             //append buttons to iframe
-            var buttonform = this._getFormContent(clickedicon);
+            var buttonform = this._getFormContent(clickedicon, marvinjsid);
             var bodycontent = Y.Node.create('<div></div>');
             bodycontent.append(buttonform).append(iframe);
             //bodycontent.append(buttonform);
@@ -128,7 +130,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
          * @return {Node} The content to place in the dialogue.
          * @private
          */
-        _getFormContent: function(clickedicon) {
+        _getFormContent: function(clickedicon, marvinjsid) {
             var template = Y.Handlebars.compile(TEMPLATE),
                 content = Y.Node.create(template({
                     elementid: this.get('host').get('elementid'),
@@ -142,7 +144,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                 }));
             this._form = content;
             this._form.one('.' + CSS.INPUTSUBMIT).on('click', this._getImgURL,
-                this);
+                this, marvinjsid);
             return content;
         },
         _getIframeURL: function() {
@@ -185,7 +187,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             xhr.setRequestHeader("Connection", "close");
             xhr.send(params);
         },
-        _getImgURL: function(e) {
+        _getImgURL: function(e, marvinjsid) {
             e.preventDefault();
             this.getDialogue({
                 focusAfterHide: null
@@ -216,14 +218,13 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
                     return;
                 }
                 var marvinController;
-                MarvinJSUtil.getEditor("#sketch").then(function(
+                MarvinJSUtil.getEditor("#" + marvinjsid).then(function(
                     sketcherInstance) {
                     marvinController = new MarvinControllerClass(
                         sketcherInstance);
-                    exportPromise = marvinController.sketcherInstance
+                    var exportPromise = marvinController.sketcherInstance
                         .exportStructure("mrv", null);
                     exportPromise.then(function(source) {
-                        console.log(source);
                         var imgsettings = {
                             'carbonLabelVisible': false,
                             'chiralFlagVisible': true,
@@ -236,7 +237,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
 
                         function test(source,
                             thefilename) {
-                            imgURL = marvin
+                            var imgURL = marvin
                                 .ImageExporter
                                 .mrvToDataUrl(
                                     source,
