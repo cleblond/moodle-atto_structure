@@ -111,7 +111,7 @@ Y.namespace('M.atto_structure').Button = Y.Base.create('button', Y.M.editor_atto
             });
             iframe.setAttribute('src', this._getIframeURL());
             iframe.setAttribute('id', marvinjsid);
-            iframe.setAttribute('data-toolbars', 'reaction');
+            iframe.setAttribute('data-toolbars', 'reporting');
             //append buttons to iframe
             var buttonform = this._getFormContent(clickedicon, marvinjsid);
             var bodycontent = Y.Node.create('<div></div>');
