@@ -41,7 +41,7 @@ function atto_structure_strings_for_js() {
  * @return array of additional params to pass to javascript init function for this module.
  */
 function atto_structure_params_for_js($elementid, $options, $fpoptions) {
-    global $USER, $COURSE;
+    global $USER, $COURSE, $CFG;
     $coursecontext           = context_course::instance($COURSE->id);
     $usercontextid           = context_user::instance($USER->id)->id;
     $disabled                = false;
@@ -54,7 +54,7 @@ function atto_structure_params_for_js($elementid, $options, $fpoptions) {
     // Add our disabled param.
     $params['disabled'] = $disabled;
     // Add our path to marvinjs.
-    $params['path']     = "http://" . $_SERVER['HTTP_HOST'] . get_config('atto_structure', 'path');
+    $params['path']     = $CFG->wwwroot . get_config('atto_structure', 'path');
     return $params;
 }
 
