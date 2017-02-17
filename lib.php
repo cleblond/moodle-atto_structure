@@ -54,7 +54,7 @@ function atto_structure_params_for_js($elementid, $options, $fpoptions) {
     // Add our disabled param.
     $params['disabled'] = $disabled;
     // Add our path to marvinjs.
-    $params['path']     = "http://" . $_SERVER['HTTP_HOST'] . get_config('atto_structure', 'path');
+    $params['path']     = "//" . $_SERVER['HTTP_HOST'] . get_config('atto_structure', 'path');
     return $params;
 }
 
